@@ -9,12 +9,12 @@ public class CharacterSystem : Singleton<CharacterSystem>
     public TargetCtrl Target { get; set; }
     public CharacterSystem()
     {
-        ClickEvent.OnClick.AddListener(OnClick);
+        InputSystem.OnClick.AddListener(OnClick);
     }
 
     private void OnClick(Vector3 mousePos)
     {
-        if (CurrentCharacter && Target)
+        if (CurrentCharacter && Target && InputSystem.GetKey(KeyCode.LeftControl))
         {
             Target.MoveTo(mousePos);
             StartWalk();

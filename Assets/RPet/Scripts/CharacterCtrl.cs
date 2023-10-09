@@ -43,8 +43,6 @@ public class CharacterCtrl : MonoBehaviour
     public void RotateTo(Vector3 target)
     {
         rotateTween?.Kill();
-        var direction = target - transform.position;
-        // 使用DOTween让角色旋转到目标方向
         rotateTween = transform.DOLookAt(target, 0.2f);
     }
     public void StopWalk(Func<bool> condition, Action callback)
