@@ -70,7 +70,6 @@ public class TransparentWindow : MonoBehaviour {
     {
         Ray ray = CameraSystem.I.Camera.ScreenPointToRay(Input.mousePosition);
         var can3D = !Physics.Raycast(ray, out _, 1000);
-        Debug.Log($"can3D:{can3D}");
         return can3D;
     }
     private void SetClickthrough(bool clickthrough) 

@@ -27,9 +27,7 @@ public class CharacterSystem : Singleton<CharacterSystem>
             CurrentCharacter.SetHeadUp(false);
             CurrentCharacter.RotateTo(Target.transform.position);
             CurrentCharacter.SetWalk(true);
-            CurrentCharacter.StopWalk(
-                () => Vector3.Distance(CurrentCharacter.transform.position, Target.transform.position) < 0.1f
-                , FaceCamera);
+            CurrentCharacter.WalkTo(Target.transform.position, FaceCamera);
         }
     }
     private void FaceCamera()

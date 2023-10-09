@@ -1,67 +1,53 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using RicKit.Comon;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityRawInput;
 
 public class InputSystem : MonoSingleton<InputSystem>
 {
     public static readonly UnityEvent<Vector3> OnClick = new UnityEvent<Vector3>();
 
-    [DllImport("user32.dll")]
-    private static extern short GetAsyncKeyState(int virtualKeyCode);
+    /*[DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int virtualKeyCode);*/
     protected override void GetAwake()
     {
-        
+#if !UNITY_EDITOR
+        RawInput.Start();
+        RawInput.WorkInBackground = true;
+        RawInput.InterceptMessages = false;
+        RawInput.OnKeyDown += OnRawKeyDown;
+#endif
+    }
+
+    private bool rawLeftButtonDown;
+    private void OnRawKeyDown(RawKey key)
+    {
+        if(key == RawKey.LeftButton)
+        {
+            rawLeftButtonDown = true;
+        }
     }
     private void Update()
     {
-        if (LeftMouseDown())
+        if (Input.GetMouseButtonDown(0) || rawLeftButtonDown)
         {
             OnClick.Invoke(Input.mousePosition);
-        }
-
-        if (GetKey(KeyCode.LeftShift))
-        {
-            Time.timeScale = 2;
-        }
-        else
-        {
-            Time.timeScale = 1;
+            rawLeftButtonDown = false;
         }
     }
-    private static bool LeftMouseDown()
-    {
-# if UNITY_EDITOR
-        return Input.GetMouseButtonDown(0);
-#else
-        return GetAsyncKeyState(0x01) != 0;
-#endif
-    }
-
     public static bool GetKey(KeyCode keyCode)
     {
-#if UNITY_EDITOR
-        return Input.GetKey(keyCode);
-#endif
+        if (Input.GetKey(keyCode))
+            return true;
+#if !UNITY_EDITOR
         switch (keyCode)
         {
-            case KeyCode.W:
-                return GetAsyncKeyState(0x57) != 0;
-            case KeyCode.A:
-                return GetAsyncKeyState(0x41) != 0;
-            case KeyCode.S:
-                return GetAsyncKeyState(0x53) != 0;
-            case KeyCode.D:
-                return GetAsyncKeyState(0x44) != 0;
-            case KeyCode.LeftControl:
-                return GetAsyncKeyState(0xA2) != 0;
-            case KeyCode.LeftShift:
-                return GetAsyncKeyState(0xA0) != 0;
-            default:
-                return false;
+            default: return false;
+            case KeyCode.LeftShift: return RawInput.IsKeyDown(RawKey.LeftShift);
+            case KeyCode.LeftControl: return RawInput.IsKeyDown(RawKey.LeftControl);
         }
+#endif
+        return false;
     }
 }

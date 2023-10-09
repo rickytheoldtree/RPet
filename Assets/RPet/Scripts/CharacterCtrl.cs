@@ -8,8 +8,8 @@ public class CharacterCtrl : MonoBehaviour
 {
     private Animator animator;
     private static readonly int Walk = Animator.StringToHash("Walk");
-    private Coroutine stopWalkCoroutine;
     private Tween rotateTween, headUpTween;
+    private Coroutine walkCoroutine;
 
     private void Awake()
     {
@@ -24,6 +24,19 @@ public class CharacterCtrl : MonoBehaviour
     {
         
     }
+
+    private void Update()
+    {
+        if (InputSystem.GetKey(KeyCode.LeftShift))
+        {
+            Time.timeScale = 2;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+    }
+
     public void SetWalk(bool walk)
     {
         animator.SetBool(Walk, walk);
@@ -45,24 +58,28 @@ public class CharacterCtrl : MonoBehaviour
         rotateTween?.Kill();
         rotateTween = transform.DOLookAt(target, 0.2f);
     }
-    public void StopWalk(Func<bool> condition, Action callback)
+
+    public void WalkTo(Vector3 target, Action callback)
     {
-        if (stopWalkCoroutine != null)
+        if (walkCoroutine != null)
         {
-            StopCoroutine(stopWalkCoroutine);
+            StopCoroutine(walkCoroutine);
         }
-        stopWalkCoroutine = StartCoroutine(StopWalkWhenCoroutine(condition, callback));
+        walkCoroutine = StartCoroutine(WalkToCoroutine(target, callback));
     }
-    private IEnumerator StopWalkWhenCoroutine(Func<bool> condition, Action callback)
+    private IEnumerator WalkToCoroutine(Vector3 target, Action callback)
     {
+        var startPos = transform.position;
+        var targetDistance = Vector3.Distance(startPos, target);
         while (true)
         {
-            yield return null;
-            if (condition())
+            var distance = Vector3.Distance(startPos, transform.position);
+            if (distance >= targetDistance)
             {
                 SetWalk(false);
                 break;
             }
+            yield return null;
         }
         callback?.Invoke();
     }
