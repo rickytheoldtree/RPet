@@ -71,7 +71,8 @@ public class CharacterCtrl : MonoBehaviour
         SetHeadUp(true);
         
     }
-    public void SetWalk(bool walk)
+
+    private void SetWalk(bool walk)
     {
         animator.SetBool(Walk, walk);
     }
@@ -81,19 +82,21 @@ public class CharacterCtrl : MonoBehaviour
         direction.y = 0;
         transform.forward = direction;
     }
-    public void SetHeadUp(bool headUp)
+
+    private void SetHeadUp(bool headUp)
     {
         headUpTween?.Kill();
-        headUpTween = DOTween.To(() => animator.GetLayerWeight(2), x => animator.SetLayerWeight(2, x),
+        headUpTween = DOTween.To(() => animator.GetLayerWeight(1), x => animator.SetLayerWeight(1, x),
             headUp ? 1 : 0, 0.2f);
     }
-    public void RotateTo(Vector3 target)
+
+    private void RotateTo(Vector3 target)
     {
         rotateTween?.Kill();
         rotateTween = transform.DOLookAt(target, 0.2f);
     }
 
-    public void WalkTo(Vector3 target, Action callback)
+    private void WalkTo(Vector3 target, Action callback)
     {
         if (walkCoroutine != null)
         {
