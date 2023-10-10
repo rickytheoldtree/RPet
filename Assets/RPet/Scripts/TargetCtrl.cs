@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class TargetCtrl : MonoBehaviour
 {
-    private void Awake()
-    {
-        CharacterSystem.I.Target = this;
-    }
     public void MoveTo(Vector3 mousePos)
     {
         //找到鼠标点击的位置在世界坐标原点平面上的位置

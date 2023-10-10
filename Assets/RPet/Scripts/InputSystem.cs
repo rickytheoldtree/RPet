@@ -6,10 +6,8 @@ using UnityRawInput;
 
 public class InputSystem : MonoSingleton<InputSystem>
 {
-    public static readonly UnityEvent<Vector3> OnClick = new UnityEvent<Vector3>();
-
-    /*[DllImport("user32.dll")]
-    private static extern short GetAsyncKeyState(int virtualKeyCode);*/
+    public static readonly UnityEvent<Vector3> OnLeftButtonDown = new UnityEvent<Vector3>();
+    
     protected override void GetAwake()
     {
 #if !UNITY_EDITOR
@@ -21,25 +19,36 @@ public class InputSystem : MonoSingleton<InputSystem>
     }
 
     private bool rawLeftButtonDown;
-    private void OnRawKeyDown(RawKey key)
+#if !UNITY_EDITOR
+        private void OnRawKeyDown(RawKey key)
     {
         if(key == RawKey.LeftButton)
         {
             rawLeftButtonDown = true;
         }
     }
+#endif
+    private void OnApplicationQuit()
+    {
+#if !UNITY_EDITOR
+        RawInput.Stop();
+#endif
+    }
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0) || rawLeftButtonDown)
         {
-            OnClick.Invoke(Input.mousePosition);
+            OnLeftButtonDown.Invoke(Input.mousePosition);
             rawLeftButtonDown = false;
         }
     }
     public static bool GetKey(KeyCode keyCode)
     {
-        if (Input.GetKey(keyCode))
-            return true;
+        return Input.GetKey(keyCode) || GetRawKey(keyCode);
+    }
+    private static bool GetRawKey(KeyCode keyCode)
+    {
 #if !UNITY_EDITOR
         switch (keyCode)
         {

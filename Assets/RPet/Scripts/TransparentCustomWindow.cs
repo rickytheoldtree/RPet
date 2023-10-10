@@ -1,12 +1,15 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using RPet;
 using UnityEngine;
 
-public class TransparentWindow : MonoBehaviour {
+public class TransparentCustomWindow : MonoBehaviour
+{
 
+    public string windowName;
+    
     [DllImport("user32.dll")]
     public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 
@@ -50,7 +53,7 @@ public class TransparentWindow : MonoBehaviour {
     {
         
 #if !UNITY_EDITOR
-        hWnd = GetActiveWindow();
+        hWnd = FindWindow(null, windowName);
 
         MARGINS margins = new MARGINS { cxLeftWidth = -1 };
         DwmExtendFrameIntoClientArea(hWnd, ref margins);

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -11,11 +10,21 @@ public class CharacterCtrl : MonoBehaviour
     private Tween rotateTween, headUpTween;
     private Coroutine walkCoroutine;
 
+    private TargetCtrl Target => target ??= new GameObject("Target").AddComponent<TargetCtrl>();
+    private TargetCtrl target;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        CharacterSystem.I.CurrentCharacter = this;
+        InputSystem.OnLeftButtonDown.AddListener(OnClick);
     }
+
+    private void Start()
+    {
+        Win32Api.MessageBox("按住Ctrl键点击地面，角色会自动走到目标位置；按下Shift人物动作会加速", "操作说明");
+        FaceCamera();
+    }
+
     public void OnRightFeetDown()
     {
         
@@ -36,7 +45,32 @@ public class CharacterCtrl : MonoBehaviour
             Time.timeScale = 1;
         }
     }
+    
 
+    private void OnClick(Vector3 mousePos)
+    {
+        if (Target && InputSystem.GetKey(KeyCode.LeftControl))
+        {
+            Target.MoveTo(mousePos);
+            StartWalk();
+        }
+    }
+    private void StartWalk()
+    {
+        if (Target)
+        {
+            SetHeadUp(false);
+            RotateTo(Target.transform.position);
+            SetWalk(true);
+            WalkTo(Target.transform.position, FaceCamera);
+        }
+    }
+    private void FaceCamera()
+    {
+        RotateTo(Vector3.back * 1000);
+        SetHeadUp(true);
+        
+    }
     public void SetWalk(bool walk)
     {
         animator.SetBool(Walk, walk);
